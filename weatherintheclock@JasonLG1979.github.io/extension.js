@@ -18,27 +18,32 @@
  * If this extension breaks your desktop you get to keep all of the pieces...
  */
 
-const {Clutter, GLib, GObject, St} = imports.gi;
-const [major, minor] = imports.misc.config.PACKAGE_VERSION.split('.').map(s => Number(s));
+import Clutter from "gi://Clutter";
+import GLib from "gi://GLib";
+import GObject from "gi://GObject";
+import St from "gi://St";
+import * as Main from "resource:///org/gnome/shell/ui/main.js";
 
 let panelWeather = null;
 
-function enable() {
-    if (!panelWeather) {
-        let statusArea = imports.ui.main.panel.statusArea;
-        let dateMenu = statusArea.dateMenu;
-        let weather = dateMenu._weatherItem._weatherClient;
-        let network = (major < 43) ? statusArea.aggregateMenu._network : statusArea.quickSettings._network;
-        let networkIcon = network ? network._primaryIndicator : null;
-        panelWeather = new PanelWeather(weather, networkIcon);
-        dateMenu.get_first_child().insert_child_above(panelWeather, dateMenu._clockDisplay);
+export default class weatherInTheClock {
+    enable() {
+        if (!panelWeather) {
+            let statusArea = Main.panel.statusArea;
+            let dateMenu = statusArea.dateMenu;
+            let weather = dateMenu._weatherItem._weatherClient;
+            let network = statusArea.quickSettings._network;
+            let networkIcon = network ? network._primaryIndicator : null;
+            panelWeather = new PanelWeather(weather, networkIcon);
+            dateMenu.get_first_child().insert_child_above(panelWeather, dateMenu._clockDisplay);
+        }
     }
-}
 
-function disable() {
-    if (panelWeather) {
-        panelWeather.destroy();
-        panelWeather = null;
+    disable() {
+        if (panelWeather) {
+            panelWeather.destroy();
+            panelWeather = null;
+        }
     }
 }
 
